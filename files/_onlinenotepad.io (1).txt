@@ -357,9 +357,6 @@ Security: Layered approach facilitates role-based access and data protection.
 Maintainability: Modular design simplifies updates and troubleshooting.
 Flexibility: Supports evolving requirements without major redesign.
 
-
-
-
 Q3a) Distributed Database (~400 words)
 
 Introduction to Distributed Databases
