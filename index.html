@@ -1,13 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDF Viewer</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Text File Viewer</title>
+<style>
+  body { font-family: Arial, sans-serif; padding: 20px; }
+  #fileList button { display: block; margin: 5px 0; }
+  #content { white-space: pre-wrap; border: 1px solid #ccc; padding: 10px; margin-top: 10px; }
+  #backBtn { margin-top: 10px; display: none; }
+</style>
 </head>
 <body>
-    <h1>PDF Viewer</h1>
-    <embed src="ANDROID PROGRAMMING PRACTICALS.pdf" width="100%" height="600" type="application/pdf">
-    <p><a href="ANDROID PROGRAMMING PRACTICALS.pdf" target="_blank">click here</a> to view it in a new tab.</p>
+  <h1>Text Files Viewer</h1>
+  <input type="file" id="fileInput" accept=".txt" multiple>
+  
+  <div id="fileList"></div>
+  <div id="content"></div>
+  <button id="backBtn" onclick="showList()">Back</button>
+
+<script>
+let filesArray = [];
+
+const fileInput = document.getElementById('fileInput');
+const fileListDiv = document.getElementById('fileList');
+const contentDiv = document.getElementById('content');
+const backBtn = document.getElementById('backBtn');
+
+fileInput.addEventListener('change', (event) => {
+  filesArray = Array.from(event.target.files);
+  showFiles();
+});
+
+function showFiles() {
+  fileListDiv.innerHTML = '';
+  contentDiv.textContent = '';
+  backBtn.style.display = 'none';
+  filesArray.forEach((file, index) => {
+    const btn = document.createElement('button');
+    btn.textContent = file.name;
+    btn.onclick = () => showFile(index);
+    fileListDiv.appendChild(btn);
+  });
+}
+
+function showFile(index) {
+  const file = filesArray[index];
+  const reader = new FileReader();
+  reader.onload = () => {
+    contentDiv.textContent = reader.result;
+    fileListDiv.style.display = 'none';
+    backBtn.style.display = 'block';
+  };
+  reader.readAsText(file);
+}
+
+function showList() {
+  contentDiv.textContent = '';
+  backBtn.style.display = 'none';
+  fileListDiv.style.display = 'block';
+}
+</script>
 </body>
 </html>
