@@ -3,226 +3,68 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Enterprise Text File Viewer</title>
+<title>Text File Viewer</title>
 <style>
-/* Reset & basic styles */
-* { box-sizing: border-box; margin:0; padding:0; }
-body {
-  font-family: 'Segoe UI', sans-serif;
-  background: #1e1e1e;
-  color: #ddd;
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  transition: background 0.3s, color 0.3s;
-}
-
-/* Navbar */
-.navbar {
-  background: #0d1a2b;
-  padding: 15px 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.navbar h1 { font-size: 20px; }
-button.emoji-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 22px;
-  margin-left: 10px;
-  transition: transform 0.2s;
-}
-button.emoji-btn:hover { transform: scale(1.2); }
-
-/* Main layout */
-.main { flex:1; display:flex; overflow:hidden; }
-.sidebar {
-  width: 250px;
-  background:#222;
-  border-right:1px solid #444;
-  padding: 15px;
-  overflow-y:auto;
-}
-#fileSearch {
-  width:100%;
-  padding:8px;
-  margin-bottom:10px;
-  border-radius:5px;
-  border:1px solid #666;
-  background:#333;
-  color:#ddd;
-}
-.sidebar button {
-  width:100%;
-  background:#007bff;
-  color:#fff;
-  border:none;
-  padding:10px;
-  margin-bottom:8px;
-  border-radius:5px;
-  cursor:pointer;
-  text-align:left;
-}
-.sidebar button:hover { background:#0056b3; }
-
-.content {
-  flex:1;
-  padding:20px;
-  overflow-y:auto;
-  background:#1b1b1b;
-  border-left:1px solid #444;
-  position:relative;
-  font-family:'Courier New', monospace;
-  white-space:pre-wrap;
-}
-
-/* Floating search in content */
-#contentSearch {
-  position:absolute;
-  top:10px;
-  right:10px;
-  width:200px;
-  padding:6px 10px;
-  border-radius:5px;
-  border:1px solid #666;
-  display:none;
-  background:#333;
-  color:#ddd;
-  z-index:1;
-}
-mark { background: yellow; color:black; }
-
-@media(max-width:768px){
-  .main{flex-direction:column;}
-  .sidebar{width:100%; border-right:none; border-bottom:1px solid #444;}
-  .content{border-left:none;}
-}
+  body { font-family: Arial, sans-serif; display: flex; flex-direction: column; margin: 0; }
+  header { padding: 10px 20px; background: #1f4e78; color: white; display: flex; justify-content: space-between; align-items: center; }
+  button { cursor: pointer; padding: 5px 10px; border: none; border-radius: 5px; }
+  main { display: flex; flex: 1; height: calc(100vh - 50px); }
+  .sidebar { width: 250px; background: #f0f0f0; padding: 10px; overflow-y: auto; }
+  .sidebar button { width: 100%; margin-bottom: 5px; background: #007bff; color: white; }
+  .sidebar button:hover { background: #0056b3; }
+  .content { flex: 1; padding: 20px; overflow-y: auto; white-space: pre-wrap; font-family: monospace; }
+  #backBtn { display: none; }
 </style>
 </head>
 <body>
 
-<div class="navbar">
-  <div style="display:flex; align-items:center; gap:10px;">
-    <button id="backBtn" class="emoji-btn" title="Back">◀</button>
-    <h1>Text File Viewer</h1>
-    <button id="fileSearchToggle" class="emoji-btn" title="Search Files">🔍</button>
-  </div>
-  <button id="darkModeToggle" class="emoji-btn" title="Dark/Light Mode">🌙</button>
-</div>
+<header>
+  <h1>Text File Viewer</h1>
+  <button id="backBtn" onclick="showList()">Back</button>
+</header>
 
-<div class="main">
-  <div class="sidebar">
-    <input type="text" id="fileSearch" placeholder="Search files...">
-    <div id="fileList">Loading files...</div>
-    <hr>
-    <h3>Upload File</h3>
-    <input type="file" id="fileInput" accept=".txt">
-    <button id="uploadBtn">Upload</button>
-    <div id="uploadStatus"></div>
-  </div>
-  <div class="content">
-    <input type="text" id="contentSearch" placeholder="Search in file...">
-    <div id="content"></div>
-  </div>
-</div>
+<main>
+  <div class="sidebar" id="fileList">Loading files...</div>
+  <div class="content" id="content"></div>
+</main>
 
 <script>
 const fileListDiv = document.getElementById('fileList');
 const contentDiv = document.getElementById('content');
 const backBtn = document.getElementById('backBtn');
-const fileSearch = document.getElementById('fileSearch');
-const contentSearch = document.getElementById('contentSearch');
-const fileSearchToggle = document.getElementById('fileSearchToggle');
-const darkModeToggle = document.getElementById('darkModeToggle');
-const uploadBtn = document.getElementById('uploadBtn');
-const fileInput = document.getElementById('fileInput');
-const uploadStatus = document.getElementById('uploadStatus');
 
-let filesArray = [];
-let currentFileContent = "";
-
-// Fetch files from Firebase via backend
-async function fetchFiles() {
-  const res = await fetch('/files');
-  filesArray = await res.json();
-  displayFiles(filesArray);
-}
-
-function displayFiles(files) {
-  if(files.length===0){ fileListDiv.textContent='No files found'; return; }
-  fileListDiv.innerHTML='';
-  files.forEach(f=>{
-    const btn=document.createElement('button');
-    btn.textContent=f.name;
-    btn.onclick=()=>showFile(f.name);
-    fileListDiv.appendChild(btn);
+// Fetch all files
+fetch('/files')
+  .then(res => res.json())
+  .then(files => {
+    if (!files.length) fileListDiv.textContent = 'No text files found';
+    else {
+      fileListDiv.innerHTML = '';
+      files.forEach(f => {
+        const btn = document.createElement('button');
+        btn.textContent = f;
+        btn.onclick = () => showFile(f);
+        fileListDiv.appendChild(btn);
+      });
+    }
   });
+
+function showFile(fileName) {
+  fetch('/file/' + fileName)
+    .then(res => res.text())
+    .then(data => {
+      contentDiv.textContent = data;
+      fileListDiv.style.display = 'none';
+      backBtn.style.display = 'inline-block';
+    });
 }
 
-async function showFile(fileName){
-  const res = await fetch('/file/' + fileName);
-  const data = await res.text();
-  currentFileContent = data;
-  contentDiv.textContent = data;
-  fileListDiv.parentElement.style.display='none';
-  backBtn.style.display='inline-block';
-  contentSearch.style.display='none';
-  contentSearch.value='';
+function showList() {
+  contentDiv.textContent = '';
+  backBtn.style.display = 'none';
+  fileListDiv.style.display = 'block';
 }
-
-backBtn.onclick = ()=>{
-  contentDiv.textContent='';
-  backBtn.style.display='none';
-  fileListDiv.parentElement.style.display='block';
-  contentSearch.style.display='none';
-}
-
-// Dark mode toggle
-darkModeToggle.onclick = ()=>{
-  document.body.classList.toggle('dark');
-  darkModeToggle.textContent = document.body.classList.contains('dark') ? '☀️' : '🌙';
-}
-
-// File search
-fileSearch.addEventListener('input', ()=>{
-  const query = fileSearch.value.toLowerCase();
-  const filtered = filesArray.filter(f=>f.name.toLowerCase().includes(query));
-  displayFiles(filtered);
-});
-
-// Floating content search toggle
-fileSearchToggle.onclick = ()=>{
-  if(currentFileContent){
-    contentSearch.style.display = contentSearch.style.display==='block' ? 'none':'block';
-    contentSearch.focus();
-  }
-}
-
-// Content search
-contentSearch.addEventListener('input', ()=>{
-  const query = contentSearch.value.toLowerCase();
-  if(!currentFileContent) return;
-  const regex = new RegExp(`(${query})`,'gi');
-  contentDiv.innerHTML = currentFileContent.replace(regex,'<mark>$1</mark>');
-});
-
-// Upload file
-uploadBtn.onclick = async ()=>{
-  if(!fileInput.files[0]) return;
-  const formData = new FormData();
-  formData.append('file', fileInput.files[0]);
-
-  const res = await fetch('/upload',{ method:'POST', body:formData });
-  const text = await res.text();
-  uploadStatus.textContent = text;
-  fileInput.value='';
-  fetchFiles();
-}
-
-// Initial fetch
-fetchFiles();
 </script>
+
 </body>
 </html>

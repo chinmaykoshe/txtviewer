@@ -1,68 +1,30 @@
 const express = require('express');
-const admin = require('firebase-admin');
-const multer = require('multer');
-const cors = require('cors');
-require('dotenv').config(); // load env
+const fs = require('fs');
+const path = require('path');
 
 const app = express();
-app.use(cors());
-app.use(express.json());
+const folder = path.join(__dirname, 'texts'); // folder with your .txt files
+
 app.use(express.static('public')); // frontend files
 
-// Parse service account from env
-const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
-});
-
-const db = admin.firestore();
-
-// Single file upload
-const upload = multer({ storage: multer.memoryStorage() });
-
-app.post('/upload', upload.single('file'), async (req, res) => {
-  if (!req.file) return res.status(400).send('No file uploaded');
-
-  const fileName = req.file.originalname;
-  const textContent = req.file.buffer.toString('utf-8');
-
-  const jsonData = {
-    name: fileName,
-    content: textContent,
-    timestamp: new Date().toISOString()
-  };
-
+// Get list of text files
+app.get('/files', (req, res) => {
   try {
-    await db.collection('files').doc(fileName).set(jsonData);
-    res.send('File uploaded and saved to Firebase!');
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Error saving to Firebase');
-  }
-});
-
-app.get('/files', async (req, res) => {
-  try {
-    const snapshot = await db.collection('files').orderBy('timestamp', 'desc').get();
-    const files = snapshot.docs.map(doc => doc.data());
+    const files = fs.readdirSync(folder).filter(f => f.endsWith('.txt'));
     res.json(files);
   } catch (err) {
     console.error(err);
-    res.status(500).send('Error fetching files');
+    res.status(500).send('Error reading files');
   }
 });
 
-app.get('/file/:name', async (req, res) => {
-  try {
-    const doc = await db.collection('files').doc(req.params.name).get();
-    if (!doc.exists) return res.status(404).send('File not found');
-    res.send(doc.data().content);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Error fetching file content');
-  }
+// Get content of a specific file
+app.get('/file/:name', (req, res) => {
+  const filePath = path.join(folder, req.params.name);
+  if (!fs.existsSync(filePath)) return res.status(404).send('File not found');
+
+  const content = fs.readFileSync(filePath, 'utf-8');
+  res.send(content);
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+app.listen(3000, () => console.log('Server running on http://localhost:3000'));
