@@ -6,6 +6,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Firebase Notepad</title>
 
+  <!-- Fonts: Quicksand -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap" rel="stylesheet">
+
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -17,24 +22,30 @@
 
     :root {
       --bg-color-light: #ffffff;
-      --text-color-light: #1a1a1a;
-      --panel-bg-light: #f8f9fa;
+      --text-color-light: #131516;
+      --panel-bg-light: #f6f7f8;
       --input-bg-light: #ffffff;
-      --input-border-light: #e5e7eb;
-      --btn-bg-light: #20808c;
+      --input-border-light: #e2e5e9;
+      --btn-bg-light: #1e7f8b;
       --btn-text-light: #ffffff;
-      --btn-hover-light: #1a6670;
-      --hover-bg-light: #f3f4f6;
+      --btn-hover-light: #176570;
+      --hover-bg-light: #eef1f4;
+      --shadow-light: 0 6px 20px rgba(0, 0, 0, 0.08);
 
-      --bg-color-dark: #191a1a;
-      --text-color-dark: #e0e0e0;
-      --panel-bg-dark: #1f2020;
-      --input-bg-dark: #252626;
-      --input-border-dark: #2f3030;
-      --btn-bg-dark: #20808c;
+      --bg-color-dark: #181a1b;
+      --text-color-dark: #e6e6e6;
+      --panel-bg-dark: #1f2123;
+      --input-bg-dark: #232528;
+      --input-border-dark: #2d3033;
+      --btn-bg-dark: #1e7f8b;
       --btn-text-dark: #ffffff;
       --btn-hover-dark: #2a9aa8;
-      --hover-bg-dark: #2a2b2b;
+      --hover-bg-dark: #26292c;
+      --shadow-dark: 0 10px 30px rgba(0, 0, 0, 0.4);
+
+      --radius-lg: 12px;
+      --radius-md: 10px;
+      --radius-sm: 8px;
 
       --bg-color: var(--bg-color-dark);
       --text-color: var(--text-color-dark);
@@ -45,6 +56,7 @@
       --btn-text: var(--btn-text-dark);
       --btn-hover: var(--btn-hover-dark);
       --hover-bg: var(--hover-bg-dark);
+      --elev: var(--shadow-dark);
     }
 
     body.light-mode {
@@ -57,11 +69,14 @@
       --btn-text: var(--btn-text-light);
       --btn-hover: var(--btn-hover-light);
       --hover-bg: var(--hover-bg-light);
+      --elev: var(--shadow-light);
     }
 
     body {
       margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      font-family: "Quicksand", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      font-optical-sizing: auto;
+      font-weight: 500;
       background: var(--bg-color);
       color: var(--text-color);
       display: flex;
@@ -80,7 +95,7 @@
       gap: 12px;
       overflow-y: auto;
       z-index: 1001;
-      transition: transform .3s ease, background-color 0.2s ease;
+      transition: transform .3s ease, background-color 0.2s ease, border-color 0.2s ease;
     }
 
     #overlay {
@@ -98,7 +113,7 @@
         top: 0;
         bottom: 0;
         transform: translateX(-100%);
-        box-shadow: 2px 0 12px rgba(0, 0, 0, .3);
+        box-shadow: var(--elev);
       }
 
       body.menu-open #sidebar {
@@ -141,7 +156,8 @@
     .title {
       margin: 0;
       font-size: 1.125rem;
-      font-weight: 600;
+      font-weight: 700;
+      letter-spacing: 0.2px;
       color: var(--text-color);
     }
 
@@ -150,17 +166,22 @@
       border: none;
       background: transparent;
       color: var(--text-color);
-      padding: 8px;
-      border-radius: 8px;
+      padding: 8px 10px;
+      border-radius: var(--radius-sm);
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      transition: background-color 0.2s ease;
+      transition: background-color 0.15s ease, box-shadow 0.15s ease, transform 0.05s ease;
+      outline: none;
     }
 
     .icon-btn:hover {
       background: var(--hover-bg);
+    }
+
+    .icon-btn:active {
+      transform: translateY(0.5px);
     }
 
     .hamburger {
@@ -178,34 +199,97 @@
     .btn {
       background: var(--btn-bg);
       color: var(--btn-text);
-      font-weight: 600;
+      font-weight: 700;
       padding: 10px 18px;
-      font-size: 0.9rem;
+      font-size: 0.95rem;
+      border-radius: var(--radius-md);
+      box-shadow: 0 2px 0 rgba(0, 0, 0, 0.04) inset;
     }
 
     .btn:hover {
       background: var(--btn-hover);
     }
 
+    .btn:focus-visible,
+    .icon-btn:focus-visible,
+    input:focus-visible,
+    textarea:focus-visible {
+      outline: 2px solid color-mix(in oklab, var(--btn-bg), white 20%);
+      outline-offset: 2px;
+      border-radius: var(--radius-sm);
+    }
+
     input[type="text"] {
       width: 100%;
-      padding: 11px 14px;
+      padding: 12px 14px;
       border: 1px solid var(--input-border);
-      border-radius: 10px;
+      border-radius: var(--radius-md);
       background: var(--input-bg);
       color: var(--text-color);
       font-size: 0.95rem;
       transition: border-color 0.2s ease, background-color 0.2s ease;
     }
 
-    input[type="text"]:focus {
-      outline: none;
-      border-color: var(--btn-bg);
-    }
-
     input[type="text"]::placeholder {
       color: var(--text-color);
-      opacity: 0.5;
+      opacity: 0.55;
+    }
+
+    /* Desktop: show individual export/delete buttons */
+    .desktop-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Mobile: show kebab menu trigger */
+    #exportToggle {
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .desktop-actions {
+        display: none;
+      }
+
+      #exportToggle {
+        display: inline-flex;
+      }
+    }
+
+    /* Export kebab dropdown menu (viewport-anchored) */
+    .export-menu {
+      position: absolute;
+      top: 0;
+      left: 0;
+      background: var(--panel-bg);
+      border: 1px solid var(--input-border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--elev);
+      display: none;
+      min-width: 180px;
+      z-index: 2000;
+      overflow: hidden;
+    }
+
+    .export-menu.open {
+      display: block;
+    }
+
+    .export-menu-item {
+      width: 100%;
+      padding: 12px 16px;
+      text-align: left;
+      border: none;
+      background: transparent;
+      color: var(--text-color);
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: background-color 0.15s ease;
+    }
+
+    .export-menu-item:hover {
+      background: var(--hover-bg);
     }
 
     /* Search dropdown panel */
@@ -216,8 +300,8 @@
       margin-top: 8px;
       background: var(--panel-bg);
       border: 1px solid var(--input-border);
-      border-radius: 10px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, .4);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--elev);
       padding: 12px;
       min-width: 320px;
       display: none;
@@ -238,22 +322,17 @@
 
     #findBoxDropdown {
       flex: 1;
-      padding: 9px 12px;
+      padding: 10px 12px;
       border: 1px solid var(--input-border);
-      border-radius: 8px;
+      border-radius: var(--radius-md);
       background: var(--input-bg);
       color: var(--text-color);
-      font-size: 0.9rem;
-    }
-
-    #findBoxDropdown:focus {
-      outline: none;
-      border-color: var(--btn-bg);
+      font-size: 0.95rem;
     }
 
     #findBoxDropdown::placeholder {
       color: var(--text-color);
-      opacity: 0.5;
+      opacity: 0.55;
     }
 
     .search-nav {
@@ -263,18 +342,18 @@
     }
 
     .nav-btn {
-      width: 32px;
-      height: 32px;
+      width: 34px;
+      height: 34px;
       padding: 6px;
       border: none;
       background: var(--input-bg);
       color: var(--text-color);
-      border-radius: 6px;
+      border-radius: var(--radius-sm);
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      transition: background-color 0.2s ease;
+      transition: background-color 0.15s ease;
     }
 
     .nav-btn:hover {
@@ -282,14 +361,14 @@
     }
 
     .nav-btn:disabled {
-      opacity: 0.4;
+      opacity: 0.45;
       cursor: not-allowed;
     }
 
     .match-info {
       font-size: 0.85rem;
       color: var(--text-color);
-      opacity: 0.7;
+      opacity: 0.75;
       text-align: center;
       min-width: 80px;
     }
@@ -307,7 +386,7 @@
       padding-bottom: 8px;
       border-bottom: 1px solid var(--input-border);
       font-size: 0.8rem;
-      font-weight: 600;
+      font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.8px;
       color: var(--text-color);
@@ -328,10 +407,10 @@
       align-items: center;
       gap: 8px;
       padding: 11px 14px;
-      border-radius: 10px;
+      border-radius: var(--radius-md);
       border: 1px solid transparent;
       cursor: pointer;
-      transition: background-color 0.2s ease;
+      transition: background-color 0.15s ease;
     }
 
     .note-item:hover {
@@ -344,11 +423,12 @@
       text-overflow: ellipsis;
       white-space: nowrap;
       font-size: 0.95rem;
+      font-weight: 600;
     }
 
     .kebab {
       padding: 6px;
-      border-radius: 6px;
+      border-radius: var(--radius-sm);
       opacity: 0.6;
     }
 
@@ -361,10 +441,10 @@
       position: absolute;
       background: var(--panel-bg);
       border: 1px solid var(--input-border);
-      border-radius: 10px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, .4);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--elev);
       display: none;
-      min-width: 150px;
+      min-width: 160px;
       z-index: 2000;
       overflow: hidden;
     }
@@ -375,14 +455,14 @@
 
     .menu-item {
       width: 100%;
-      padding: 11px 16px;
+      padding: 12px 16px;
       text-align: left;
       border: none;
       background: transparent;
       color: var(--text-color);
       cursor: pointer;
-      font-size: 0.9rem;
-      transition: background-color 0.2s ease;
+      font-size: 0.95rem;
+      transition: background-color 0.15s ease;
     }
 
     .menu-item:hover {
@@ -400,23 +480,17 @@
     }
 
     #noteName {
-      padding: 11px 14px;
+      padding: 12px 14px;
       border: 1px solid var(--input-border);
-      border-radius: 10px;
+      border-radius: var(--radius-md);
       background: var(--input-bg);
       color: var(--text-color);
       font-size: 0.95rem;
-      transition: border-color 0.2s ease, background-color 0.2s ease;
-    }
-
-    #noteName:focus {
-      outline: none;
-      border-color: var(--btn-bg);
     }
 
     #noteName::placeholder {
       color: var(--text-color);
-      opacity: 0.5;
+      opacity: 0.55;
     }
 
     #buttons {
@@ -430,7 +504,7 @@
       flex: 1;
       width: 100%;
       overflow: hidden;
-      border-radius: 10px;
+      border-radius: var(--radius-md);
     }
 
     #highlightBackdrop {
@@ -441,12 +515,12 @@
       height: 100%;
       padding: 16px;
       border: 1px solid var(--input-border);
-      border-radius: 10px;
+      border-radius: var(--radius-md);
       background: var(--input-bg);
       color: transparent;
       font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
       font-size: 0.95rem;
-      line-height: 1.6;
+      line-height: 1.65;
       white-space: pre-wrap;
       word-wrap: break-word;
       overflow: auto;
@@ -463,24 +537,14 @@
       resize: none;
       padding: 16px;
       border: 1px solid var(--input-border);
-      border-radius: 10px;
+      border-radius: var(--radius-md);
       background: transparent;
       color: var(--text-color);
       font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
       font-size: 0.95rem;
-      line-height: 1.6;
+      line-height: 1.65;
       overflow: auto;
       transition: color 0.2s ease, border-color 0.2s ease;
-    }
-
-    #noteContent:focus {
-      outline: none;
-      border-color: var(--btn-bg);
-    }
-
-    #noteContent::placeholder {
-      color: var(--text-color);
-      opacity: 0.4;
     }
 
     #noteContent.readonly {
@@ -518,15 +582,15 @@
     }
 
     .theme-row label {
-      font-size: 0.9rem;
+      font-size: 0.95rem;
       color: var(--text-color);
-      font-weight: 500;
+      font-weight: 600;
     }
 
     .switch {
       position: relative;
-      width: 52px;
-      height: 28px;
+      width: 54px;
+      height: 30px;
     }
 
     .switch input {
@@ -541,14 +605,14 @@
       cursor: pointer;
       background: #3f3f3f;
       transition: .25s;
-      border-radius: 28px;
+      border-radius: 30px;
     }
 
     .slider:before {
       content: "";
       position: absolute;
-      height: 22px;
-      width: 22px;
+      height: 24px;
+      width: 24px;
       left: 3px;
       bottom: 3px;
       background: #fff;
@@ -602,7 +666,7 @@
         <button id="findToggle" class="icon-btn" title="Find in note" aria-label="Find">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
             <path
-              d="M15.5 14h-.79l-.28-.27a6.471 6.471 0 0 0 1.57-4.23C15.99 6.01 13.48 3.5 10.5 3.5S5.01 6.01 5.01 9s2.51 5.5 5.49 5.5c1.61 0 3.09-.66 4.15-1.73l.27.28v.79l4.25 4.25c.41.41 1.08.41 1.49 0s.41-1.08 0-1.49L15.5 14zm-5 0C8.01 14 6 11.99 6 9.5S8.01 5 10.5 5 15 7.01 15 9.5 12.99 14 10.5 14z" />
+              d="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z" />
           </svg>
         </button>
 
@@ -613,11 +677,42 @@
           </svg>
         </button>
 
-        <button id="deleteOpenBtn" class="icon-btn" title="Delete note" aria-label="Delete">
+        <!-- Desktop: Individual buttons -->
+        <div class="desktop-actions">
+          <button id="txtBtn" class="icon-btn" title="Export as TXT" aria-label="Export TXT">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
+            </svg>
+          </button>
+
+          <button id="pdfBtn" class="icon-btn" title="Export as PDF" aria-label="Export PDF">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path
+                d="M14,2L20,8V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V4A2,2 0 0,1 6,2H14M18,20V9H13V4H6V20H18M10,19H12V18H10.5V17H12V16H10.5V15H12V14H10V19M14.5,19H16.5L15.5,14H14L14.5,19Z" />
+            </svg>
+          </button>
+
+          <button id="deleteOpenBtn" class="icon-btn" title="Delete note" aria-label="Delete">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
+            </svg>
+          </button>
+        </div>
+
+        <!-- Mobile: Kebab menu trigger -->
+        <button id="exportToggle" class="icon-btn" title="More options" aria-label="More" aria-haspopup="menu"
+          aria-expanded="false">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
+            <path d="M12 8a2 2 0 110-4 2 2 0 010 4zm0 6a2 2 0 110-4 2 2 0 010 4zm0 6a2 2 0 110-4 2 2 0 010 4z" />
           </svg>
         </button>
+      </div>
+
+      <!-- Mobile export dropdown (anchored to viewport) -->
+      <div class="export-menu" id="exportMenu" role="menu" aria-label="Export menu">
+        <button class="export-menu-item" role="menuitem" id="txtBtnMobile">Export as TXT</button>
+        <button class="export-menu-item" role="menuitem" id="pdfBtnMobile">Export as PDF</button>
+        <button class="export-menu-item" role="menuitem" id="deleteOpenBtnMobile">Delete Note</button>
       </div>
 
       <!-- Search Panel Dropdown -->
@@ -651,8 +746,6 @@
       <input type="text" id="noteName" placeholder="Note Name" autocomplete="off" />
       <div id="buttons">
         <button id="saveBtn" class="btn">Save Note</button>
-        <button id="txtBtn" class="btn">Export TXT</button>
-        <button id="pdfBtn" class="btn">Export PDF</button>
       </div>
 
       <div class="textarea-container">
@@ -688,8 +781,13 @@
     const saveBtn = document.getElementById('saveBtn');
     const txtBtn = document.getElementById('txtBtn');
     const pdfBtn = document.getElementById('pdfBtn');
+    const txtBtnMobile = document.getElementById('txtBtnMobile');
+    const pdfBtnMobile = document.getElementById('pdfBtnMobile');
+    const exportToggle = document.getElementById('exportToggle');
+    const exportMenu = document.getElementById('exportMenu');
     const editToggle = document.getElementById('editToggle');
     const deleteOpenBtn = document.getElementById('deleteOpenBtn');
+    const deleteOpenBtnMobile = document.getElementById('deleteOpenBtnMobile');
     const findToggle = document.getElementById('findToggle');
     const searchPanel = document.getElementById('searchPanel');
     const findBoxDropdown = document.getElementById('findBoxDropdown');
@@ -709,6 +807,108 @@
     function closeMenu() { document.body.classList.remove('menu-open'); }
     hamburgerBtn.addEventListener('click', openMenu);
     overlay.addEventListener('click', closeMenu);
+
+    // Robust export menu: viewport clamping + safe measuring
+    let exportOutsideAbort = null;
+
+    function positionExportMenu() {
+      if (exportMenu.parentElement !== document.body) {
+        document.body.appendChild(exportMenu);
+      }
+
+      // Measure without permanently overriding display
+      const wasHidden = getComputedStyle(exportMenu).display === 'none';
+      if (wasHidden) {
+        exportMenu.style.visibility = 'hidden';
+        exportMenu.style.display = 'block';
+      }
+
+      const rect = exportToggle.getBoundingClientRect();
+      const menuWidth = exportMenu.offsetWidth;
+      const menuHeight = exportMenu.offsetHeight;
+
+      let top = rect.bottom + window.scrollY + 6;
+      let left = rect.right - menuWidth + window.scrollX;
+
+      const margin = 10;
+      left = Math.max(
+        margin + window.scrollX,
+        Math.min(left, window.scrollX + window.innerWidth - menuWidth - margin)
+      );
+
+      const maxBottom = window.scrollY + window.innerHeight - margin;
+      if (top + menuHeight > maxBottom) {
+        top = rect.top + window.scrollY - menuHeight - 6;
+      }
+
+      exportMenu.style.top = `${top}px`;
+      exportMenu.style.left = `${left}px`;
+
+      if (wasHidden) {
+        // Let CSS .open control visibility; do not force 'none'
+        exportMenu.style.display = '';
+        exportMenu.style.visibility = '';
+      }
+    }
+
+    function bindExportOutsideHandlers() {
+      exportOutsideAbort = new AbortController();
+      const signal = exportOutsideAbort.signal;
+
+      // Close on pointer outside (capture to fire before click)
+      window.addEventListener('pointerdown', (e) => {
+        if (!exportMenu.classList.contains('open')) return;
+        const onToggle = exportToggle.contains(e.target);
+        const onMenu = exportMenu.contains(e.target);
+        if (!onToggle && !onMenu) closeExportMenu();
+      }, { capture: true, signal });
+
+      // Escape key
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && exportMenu.classList.contains('open')) {
+          closeExportMenu();
+          exportToggle.focus();
+        }
+      }, { signal });
+
+      // Reposition on resize
+      window.addEventListener('resize', () => {
+        if (exportMenu.classList.contains('open')) positionExportMenu();
+      }, { signal });
+
+      // Close on scroll anywhere
+      window.addEventListener('scroll', () => {
+        if (exportMenu.classList.contains('open')) closeExportMenu();
+      }, { capture: true, signal });
+    }
+
+    function unbindExportOutsideHandlers() {
+      exportOutsideAbort?.abort();
+      exportOutsideAbort = null;
+    }
+
+    function openExportMenu() {
+      exportMenu.classList.add('open');
+      exportToggle.setAttribute('aria-expanded', 'true');
+      positionExportMenu();
+      bindExportOutsideHandlers();
+    }
+
+    function closeExportMenu() {
+      exportMenu.classList.remove('open');
+      exportToggle.setAttribute('aria-expanded', 'false');
+      unbindExportOutsideHandlers();
+    }
+
+    exportToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (exportMenu.classList.contains('open')) closeExportMenu();
+      else openExportMenu();
+    });
+
+    // Prevent inside clicks from propagating as "outside"
+    exportMenu.addEventListener('click', (e) => e.stopPropagation());
+
 
     function setEditing(editing) {
       isEditing = editing;
@@ -744,21 +944,17 @@
       if (currentSearchTerm) {
         const regex = new RegExp(escapeRegex(currentSearchTerm), 'gi');
         let match;
-        let tempText = text;
-        let offset = 0;
-
-        while ((match = regex.exec(tempText)) !== null) {
-          matchPositions.push({ start: match.index + offset, end: match.index + offset + match[0].length });
+        while ((match = regex.exec(text)) !== null) {
+          matchPositions.push({ start: match.index, end: match.index + match[0].length });
         }
 
         if (matchPositions.length > 0) {
           let lastIndex = 0;
           let result = '';
-
           matchPositions.forEach((pos, idx) => {
             result += escapeHtml(text.substring(lastIndex, pos.start));
-            const matchClass = idx === currentMatchIndex ? 'mark current-match' : 'mark';
-            result += `<${matchClass}>${escapeHtml(text.substring(pos.start, pos.end))}</${matchClass}>`;
+            const classAttr = idx === currentMatchIndex ? ' class="current-match"' : '';
+            result += `<mark${classAttr}>${escapeHtml(text.substring(pos.start, pos.end))}</mark>`;
             lastIndex = pos.end;
           });
           result += escapeHtml(text.substring(lastIndex));
@@ -801,8 +997,7 @@
       noteContent.focus();
       noteContent.setSelectionRange(pos.start, pos.end);
 
-      // Scroll into view
-      const lineHeight = 1.6;
+      const lineHeight = 1.65;
       const fontSize = 0.95;
       const lines = noteContent.value.substring(0, pos.start).split('\n').length;
       const scrollTop = (lines - 5) * (fontSize * 16 * lineHeight);
@@ -854,11 +1049,8 @@
 
     findBoxDropdown.addEventListener('input', (e) => {
       currentSearchTerm = e.target.value.trim();
-      currentMatchIndex = currentSearchTerm && matchPositions.length > 0 ? 0 : -1;
+      currentMatchIndex = -1;
       applyHighlights();
-      if (currentSearchTerm && matchPositions.length > 0) {
-        scrollToMatch(0);
-      }
     });
 
     findBoxDropdown.addEventListener('keydown', (e) => {
@@ -940,7 +1132,8 @@
         menu.appendChild(renameItem);
         menu.appendChild(deleteItem);
 
-        function openKebabMenu() {
+        function openKebabMenu(e) {
+          e.stopPropagation();
           const rect = kebab.getBoundingClientRect();
           menu.style.top = (rect.bottom + window.scrollY + 6) + 'px';
           menu.style.left = (rect.right + window.scrollX - 150) + 'px';
@@ -954,7 +1147,7 @@
         kebab.addEventListener('click', (e) => {
           e.stopPropagation();
           if (menu.classList.contains('open')) closeKebabMenu();
-          else openKebabMenu();
+          else openKebabMenu(e);
         });
         document.addEventListener('click', (e) => {
           if (!menu.contains(e.target) && e.target !== kebab) closeKebabMenu();
@@ -1027,8 +1220,11 @@
       try {
         await db.collection('notes').doc(id).set({ content: noteContent.value || '' });
         const idx = allNotes.findIndex(n => n.id === id);
-        if (idx >= 0) allNotes[idx].content = noteContent.value || '';
-        else allNotes.push({ id, content: noteContent.value || '' });
+        if (idx >= 0) {
+          allNotes[idx].content = noteContent.value || '';
+        } else {
+          allNotes.push({ id, content: noteContent.value || '' });
+        }
         allNotes.sort((a, b) => a.id.localeCompare(b.id));
         renderList(filterNotes(searchNotesInput.value));
         currentNoteId = id;
@@ -1047,6 +1243,7 @@
         allNotes = allNotes.filter(n => n.id !== id);
         renderList(filterNotes(searchNotesInput.value));
         clearEditor();
+        closeExportMenu();
       } catch (e) {
         alert('Delete failed: ' + e.message);
       }
@@ -1061,12 +1258,13 @@
       a.download = name + '.txt';
       a.click();
       URL.revokeObjectURL(a.href);
+      closeExportMenu();
     }
 
     function exportPDF() {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF({ unit: 'mm', format: 'a4' });
-      const left = 10, top = 10, right = 10, bottom = 10;
+      const left = 12, top = 12, right = 12, bottom = 12;
       const pageWidth = doc.internal.pageSize.getWidth ? doc.internal.pageSize.getWidth() : doc.internal.pageSize.width;
       const pageHeight = doc.internal.pageSize.getHeight ? doc.internal.pageSize.getHeight() : doc.internal.pageSize.height;
       const maxWidth = pageWidth - left - right;
@@ -1090,7 +1288,29 @@
 
       const name = (noteNameInput.value.trim() || 'note') + '.pdf';
       doc.save(name);
+      closeExportMenu();
     }
+
+    // Wire buttons
+    saveBtn.addEventListener('click', saveNote);
+    txtBtn.addEventListener('click', exportTXT);
+    pdfBtn.addEventListener('click', exportPDF);
+    deleteOpenBtn.addEventListener('click', deleteOpenNote);
+
+    txtBtnMobile.addEventListener('click', exportTXT);
+    pdfBtnMobile.addEventListener('click', exportPDF);
+    deleteOpenBtnMobile.addEventListener('click', deleteOpenNote);
+
+    editToggle.addEventListener('click', () => {
+      const hasIdOrContent = !!(noteNameInput.value.trim() || noteContent.value);
+      if (!hasIdOrContent) {
+        setEditing(true);
+        noteNameInput.focus();
+      } else {
+        setEditing(!isEditing);
+        if (isEditing) noteNameInput.focus();
+      }
+    });
 
     function loadTheme() {
       try {
@@ -1105,20 +1325,6 @@
       } catch { }
     }
 
-    newFileBtn.addEventListener('click', () => { clearEditor(); noteNameInput.focus(); closeMenu(); });
-    searchNotesInput.addEventListener('input', () => renderList(filterNotes(searchNotesInput.value)));
-
-    saveBtn.addEventListener('click', saveNote);
-    txtBtn.addEventListener('click', exportTXT);
-    pdfBtn.addEventListener('click', exportPDF);
-    deleteOpenBtn.addEventListener('click', deleteOpenNote);
-
-    editToggle.addEventListener('click', () => {
-      const hasIdOrContent = !!(noteNameInput.value.trim() || noteContent.value);
-      if (!hasIdOrContent) { setEditing(true); noteNameInput.focus(); }
-      else { setEditing(!isEditing); if (isEditing) noteNameInput.focus(); }
-    });
-
     themeToggle.addEventListener('change', () => {
       if (themeToggle.checked) {
         document.body.classList.add('light-mode');
@@ -1129,15 +1335,10 @@
       }
     });
 
-    // Close search panel when clicking outside
-    document.addEventListener('click', (e) => {
-      if (!searchPanel.contains(e.target) && e.target !== findToggle) {
-        if (searchPanel.classList.contains('open') && !e.target.closest('.icon-btn')) {
-          // Don't auto-close, let user use close button
-        }
-      }
-    });
+    newFileBtn.addEventListener('click', () => { clearEditor(); noteNameInput.focus(); closeMenu(); });
+    searchNotesInput.addEventListener('input', () => renderList(filterNotes(searchNotesInput.value)));
 
+    // Initial load
     loadTheme();
     setEditing(true);
     loadList();
