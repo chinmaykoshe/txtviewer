@@ -1,39 +1,68 @@
 const express = require('express');
-const fs = require('fs');
-const path = require('path');
+const admin = require('firebase-admin');
 const multer = require('multer');
+const cors = require('cors');
+require('dotenv').config(); // load env
 
 const app = express();
-const folder = path.join(__dirname, 'texts');
+app.use(cors());
+app.use(express.json());
+app.use(express.static('public')); // frontend files
 
-// Serve static files
-app.use(express.static(__dirname));
+// Parse service account from env
+const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
 
-// Multer setup
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, folder);
-  },
-  filename: function (req, file, cb) {
-    cb(null, file.originalname);
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+});
+
+const db = admin.firestore();
+
+// Single file upload
+const upload = multer({ storage: multer.memoryStorage() });
+
+app.post('/upload', upload.single('file'), async (req, res) => {
+  if (!req.file) return res.status(400).send('No file uploaded');
+
+  const fileName = req.file.originalname;
+  const textContent = req.file.buffer.toString('utf-8');
+
+  const jsonData = {
+    name: fileName,
+    content: textContent,
+    timestamp: new Date().toISOString()
+  };
+
+  try {
+    await db.collection('files').doc(fileName).set(jsonData);
+    res.send('File uploaded and saved to Firebase!');
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error saving to Firebase');
   }
 });
-const upload = multer({ storage: storage });
 
-// Get list of files
-app.get('/files', (req, res) => {
-  const files = fs.readdirSync(folder).filter(f => f.endsWith('.txt'));
-  res.json(files);
+app.get('/files', async (req, res) => {
+  try {
+    const snapshot = await db.collection('files').orderBy('timestamp', 'desc').get();
+    const files = snapshot.docs.map(doc => doc.data());
+    res.json(files);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error fetching files');
+  }
 });
 
-// Get single file content
-app.get('/file/:name', (req, res) => {
-  res.sendFile(path.join(folder, req.params.name));
+app.get('/file/:name', async (req, res) => {
+  try {
+    const doc = await db.collection('files').doc(req.params.name).get();
+    if (!doc.exists) return res.status(404).send('File not found');
+    res.send(doc.data().content);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error fetching file content');
+  }
 });
 
-// Upload file
-app.post('/upload', upload.single('file'), (req, res) => {
-  res.json({ success: true, file: req.file.originalname });
-});
-
-app.listen(3000, () => console.log('Server running on http://localhost:3000'));
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
