@@ -16,9 +16,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     :root {
       --bg-color-light: #ffffff;
@@ -99,534 +97,192 @@
     }
 
     #overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, .6);
-      display: none;
-      z-index: 1000;
+      position: fixed; inset: 0; background: rgba(0, 0, 0, .6);
+      display: none; z-index: 1000;
     }
 
     @media (max-width: 768px) {
-      #sidebar {
-        position: fixed;
-        left: 0;
-        top: 0;
-        bottom: 0;
-        transform: translateX(-100%);
-        box-shadow: var(--elev);
-      }
-
-      body.menu-open #sidebar {
-        transform: translateX(0);
-      }
-
-      body.menu-open #overlay {
-        display: block;
-      }
+      #sidebar { position: fixed; left: 0; top: 0; bottom: 0; transform: translateX(-100%); box-shadow: var(--elev); }
+      body.menu-open #sidebar { transform: translateX(0); }
+      body.menu-open #overlay { display: block; }
     }
 
-    #main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      min-width: 0;
-      position: relative;
-    }
+    #main { flex: 1; display: flex; flex-direction: column; min-width: 0; position: relative; }
 
     .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      padding: 14px 20px;
-      border-bottom: 1px solid var(--input-border);
-      background: var(--panel-bg);
-      transition: background-color 0.2s ease, border-color 0.2s ease;
-      position: relative;
-      z-index: 100;
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      padding: 14px 20px; border-bottom: 1px solid var(--input-border);
+      background: var(--panel-bg); transition: background-color 0.2s ease, border-color 0.2s ease;
+      position: relative; z-index: 100;
     }
 
-    .left-group,
-    .actions {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+    .left-group, .actions { display: flex; align-items: center; gap: 10px; }
 
-    .title {
-      margin: 0;
-      font-size: 1.125rem;
-      font-weight: 700;
-      letter-spacing: 0.2px;
-      color: var(--text-color);
-    }
+    .title { margin: 0; font-size: 1.125rem; font-weight: 700; letter-spacing: 0.2px; color: var(--text-color); }
 
-    .icon-btn,
-    .btn {
-      border: none;
-      background: transparent;
-      color: var(--text-color);
-      padding: 8px 10px;
-      border-radius: var(--radius-sm);
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      transition: background-color 0.15s ease, box-shadow 0.15s ease, transform 0.05s ease;
-      outline: none;
+    .icon-btn, .btn {
+      border: none; background: transparent; color: var(--text-color); padding: 8px 10px; border-radius: var(--radius-sm);
+      cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+      transition: background-color 0.15s ease, box-shadow 0.15s ease, transform 0.05s ease; outline: none;
     }
+    .icon-btn:hover { background: var(--hover-bg); }
+    .icon-btn:active { transform: translateY(0.5px); }
 
-    .icon-btn:hover {
-      background: var(--hover-bg);
-    }
-
-    .icon-btn:active {
-      transform: translateY(0.5px);
-    }
-
-    .hamburger {
-      width: 38px;
-      height: 38px;
-      border: 1px solid var(--input-border);
-    }
-
-    @media (min-width: 769px) {
-      .hamburger {
-        display: none;
-      }
-    }
+    .hamburger { width: 38px; height: 38px; border: 1px solid var(--input-border); }
+    @media (min-width: 769px) { .hamburger { display: none; } }
 
     .btn {
-      background: var(--btn-bg);
-      color: var(--btn-text);
-      font-weight: 700;
-      padding: 10px 18px;
-      font-size: 0.95rem;
-      border-radius: var(--radius-md);
-      box-shadow: 0 2px 0 rgba(0, 0, 0, 0.04) inset;
+      background: var(--btn-bg); color: var(--btn-text); font-weight: 700; padding: 10px 18px; font-size: 0.95rem;
+      border-radius: var(--radius-md); box-shadow: 0 2px 0 rgba(0,0,0,0.04) inset;
     }
-
-    .btn:hover {
-      background: var(--btn-hover);
-    }
+    .btn:hover { background: var(--btn-hover); }
 
     .btn:focus-visible,
     .icon-btn:focus-visible,
     input:focus-visible,
     textarea:focus-visible {
-      outline: 2px solid color-mix(in oklab, var(--btn-bg), white 20%);
-      outline-offset: 2px;
-      border-radius: var(--radius-sm);
+      outline: 2px solid color-mix(in oklab, var(--btn-bg), white 20%); outline-offset: 2px; border-radius: var(--radius-sm);
     }
 
     input[type="text"] {
-      width: 100%;
-      padding: 12px 14px;
-      border: 1px solid var(--input-border);
-      border-radius: var(--radius-md);
-      background: var(--input-bg);
-      color: var(--text-color);
-      font-size: 0.95rem;
-      transition: border-color 0.2s ease, background-color 0.2s ease;
+      width: 100%; padding: 12px 14px; border: 1px solid var(--input-border); border-radius: var(--radius-md);
+      background: var(--input-bg); color: var(--text-color); font-size: 0.95rem; transition: border-color 0.2s ease, background-color 0.2s ease;
     }
+    input[type="text"]::placeholder { color: var(--text-color); opacity: 0.55; }
 
-    input[type="text"]::placeholder {
-      color: var(--text-color);
-      opacity: 0.55;
-    }
-
-    /* Desktop: show individual export/delete buttons */
-    .desktop-actions {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    /* Mobile: show kebab menu trigger */
-    #exportToggle {
-      display: none;
-    }
+    .desktop-actions { display: flex; align-items: center; gap: 10px; }
+    #exportToggle { display: none; }
 
     @media (max-width: 768px) {
-      .desktop-actions {
-        display: none;
-      }
-
-      #exportToggle {
-        display: inline-flex;
-      }
+      .desktop-actions { display: none; }
+      #exportToggle { display: inline-flex; }
     }
 
-    /* Export kebab dropdown menu (viewport-anchored) */
     .export-menu {
-      position: absolute;
-      top: 0;
-      left: 0;
-      background: var(--panel-bg);
-      border: 1px solid var(--input-border);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--elev);
-      display: none;
-      min-width: 180px;
-      z-index: 2000;
-      overflow: hidden;
+      position: absolute; top: 0; left: 0; background: var(--panel-bg); border: 1px solid var(--input-border);
+      border-radius: var(--radius-lg); box-shadow: var(--elev); display: none; min-width: 180px; z-index: 2000; overflow: hidden;
     }
-
-    .export-menu.open {
-      display: block;
-    }
-
+    .export-menu.open { display: block; }
     .export-menu-item {
-      width: 100%;
-      padding: 12px 16px;
-      text-align: left;
-      border: none;
-      background: transparent;
-      color: var(--text-color);
-      cursor: pointer;
-      font-size: 0.95rem;
-      transition: background-color 0.15s ease;
+      width: 100%; padding: 12px 16px; text-align: left; border: none; background: transparent; color: var(--text-color);
+      cursor: pointer; font-size: 0.95rem; transition: background-color 0.15s ease;
     }
+    .export-menu-item:hover { background: var(--hover-bg); }
 
-    .export-menu-item:hover {
-      background: var(--hover-bg);
-    }
-
-    /* Search dropdown panel */
     .search-panel {
-      position: absolute;
-      top: 100%;
-      right: 20px;
-      margin-top: 8px;
-      background: var(--panel-bg);
-      border: 1px solid var(--input-border);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--elev);
-      padding: 12px;
-      min-width: 320px;
-      display: none;
-      z-index: 150;
+      position: absolute; top: 100%; right: 20px; margin-top: 8px; background: var(--panel-bg);
+      border: 1px solid var(--input-border); border-radius: var(--radius-lg); box-shadow: var(--elev);
+      padding: 12px; min-width: 320px; display: none; z-index: 150;
     }
-
-    .search-panel.open {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .search-input-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
+    .search-panel.open { display: flex; flex-direction: column; gap: 10px; }
+    .search-input-row { display: flex; align-items: center; gap: 8px; }
     #findBoxDropdown {
-      flex: 1;
-      padding: 10px 12px;
-      border: 1px solid var(--input-border);
-      border-radius: var(--radius-md);
-      background: var(--input-bg);
-      color: var(--text-color);
-      font-size: 0.95rem;
+      flex: 1; padding: 10px 12px; border: 1px solid var(--input-border); border-radius: var(--radius-md);
+      background: var(--input-bg); color: var(--text-color); font-size: 0.95rem;
     }
-
-    #findBoxDropdown::placeholder {
-      color: var(--text-color);
-      opacity: 0.55;
-    }
-
-    .search-nav {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
+    #findBoxDropdown::placeholder { color: var(--text-color); opacity: 0.55; }
+    .search-nav { display: flex; align-items: center; gap: 6px; }
     .nav-btn {
-      width: 34px;
-      height: 34px;
-      padding: 6px;
-      border: none;
-      background: var(--input-bg);
-      color: var(--text-color);
-      border-radius: var(--radius-sm);
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
+      width: 34px; height: 34px; padding: 6px; border: none; background: var(--input-bg); color: var(--text-color);
+      border-radius: var(--radius-sm); cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
       transition: background-color 0.15s ease;
     }
+    .nav-btn:hover { background: var(--hover-bg); }
+    .nav-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    .match-info { font-size: 0.85rem; color: var(--text-color); opacity: 0.75; text-align: center; min-width: 80px; }
 
-    .nav-btn:hover {
-      background: var(--hover-bg);
-    }
-
-    .nav-btn:disabled {
-      opacity: 0.45;
-      cursor: not-allowed;
-    }
-
-    .match-info {
-      font-size: 0.85rem;
-      color: var(--text-color);
-      opacity: 0.75;
-      text-align: center;
-      min-width: 80px;
-    }
-
-    @media (max-width: 768px) {
-      .search-panel {
-        right: 10px;
-        left: 10px;
-        min-width: auto;
-      }
-    }
+    @media (max-width: 768px) { .search-panel { right: 10px; left: 10px; min-width: auto; } }
 
     #notesList h3 {
-      margin: 14px 0 10px;
-      padding-bottom: 8px;
-      border-bottom: 1px solid var(--input-border);
-      font-size: 0.8rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      color: var(--text-color);
-      opacity: 0.6;
+      margin: 14px 0 10px; padding-bottom: 8px; border-bottom: 1px solid var(--input-border);
+      font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px;
+      color: var(--text-color); opacity: 0.6;
     }
 
-    #notesUl {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
+    #notesUl { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
 
     .note-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 11px 14px;
-      border-radius: var(--radius-md);
-      border: 1px solid transparent;
-      cursor: pointer;
-      transition: background-color 0.15s ease;
+      display: flex; align-items: center; gap: 8px; padding: 11px 14px; border-radius: var(--radius-md);
+      border: 1px solid transparent; cursor: pointer; transition: background-color 0.15s ease;
     }
+    .note-item:hover { background: var(--hover-bg); }
 
-    .note-item:hover {
-      background: var(--hover-bg);
-    }
+    .note-title { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.95rem; font-weight: 600; }
 
-    .note-title {
-      flex: 1;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      font-size: 0.95rem;
-      font-weight: 600;
-    }
-
-    .kebab {
-      padding: 6px;
-      border-radius: var(--radius-sm);
-      opacity: 0.6;
-    }
-
-    .kebab:hover {
-      opacity: 1;
-      background: var(--hover-bg);
-    }
+    .kebab { padding: 6px; border-radius: var(--radius-sm); opacity: 0.6; }
+    .kebab:hover { opacity: 1; background: var(--hover-bg); }
 
     .menu {
-      position: absolute;
-      background: var(--panel-bg);
-      border: 1px solid var(--input-border);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--elev);
-      display: none;
-      min-width: 160px;
-      z-index: 2000;
-      overflow: hidden;
+      position: absolute; background: var(--panel-bg); border: 1px solid var(--input-border);
+      border-radius: var(--radius-lg); box-shadow: var(--elev); display: none; min-width: 160px; z-index: 2000; overflow: hidden;
     }
-
-    .menu.open {
-      display: block;
-    }
-
+    .menu.open { display: block; }
     .menu-item {
-      width: 100%;
-      padding: 12px 16px;
-      text-align: left;
-      border: none;
-      background: transparent;
-      color: var(--text-color);
-      cursor: pointer;
-      font-size: 0.95rem;
-      transition: background-color 0.15s ease;
+      width: 100%; padding: 12px 16px; text-align: left; border: none; background: transparent; color: var(--text-color);
+      cursor: pointer; font-size: 0.95rem; transition: background-color 0.15s ease;
     }
+    .menu-item:hover { background: var(--hover-bg); }
 
-    .menu-item:hover {
-      background: var(--hover-bg);
-    }
+    .editor-panel { display: flex; flex-direction: column; gap: 14px; padding: 20px; height: calc(100vh - 59px); background: var(--bg-color); transition: background-color 0.2s ease; }
+    #noteName { padding: 12px 14px; border: 1px solid var(--input-border); border-radius: var(--radius-md); background: var(--input-bg); color: var(--text-color); font-size: 0.95rem; }
+    #noteName::placeholder { color: var(--text-color); opacity: 0.55; }
+    #buttons { display: flex; gap: 10px; flex-wrap: wrap; }
 
-    .editor-panel {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      padding: 20px;
-      height: calc(100vh - 59px);
-      background: var(--bg-color);
-      transition: background-color 0.2s ease;
-    }
-
-    #noteName {
-      padding: 12px 14px;
-      border: 1px solid var(--input-border);
-      border-radius: var(--radius-md);
-      background: var(--input-bg);
-      color: var(--text-color);
-      font-size: 0.95rem;
-    }
-
-    #noteName::placeholder {
-      color: var(--text-color);
-      opacity: 0.55;
-    }
-
-    #buttons {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .textarea-container {
-      position: relative;
-      flex: 1;
-      width: 100%;
-      overflow: hidden;
-      border-radius: var(--radius-md);
-    }
-
+    .textarea-container { position: relative; flex: 1; width: 100%; overflow: hidden; border-radius: var(--radius-md); }
     #highlightBackdrop {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      padding: 16px;
-      border: 1px solid var(--input-border);
-      border-radius: var(--radius-md);
-      background: var(--input-bg);
-      color: transparent;
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%; padding: 16px; border: 1px solid var(--input-border);
+      border-radius: var(--radius-md); background: var(--input-bg); color: transparent;
       font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
-      font-size: 0.95rem;
-      line-height: 1.65;
-      white-space: pre-wrap;
-      word-wrap: break-word;
-      overflow: auto;
-      pointer-events: none;
+      font-size: 0.95rem; line-height: 1.65; white-space: pre-wrap; word-wrap: break-word; overflow: auto; pointer-events: none;
       transition: background-color 0.2s ease, border-color 0.2s ease;
     }
-
     #noteContent {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      resize: none;
-      padding: 16px;
-      border: 1px solid var(--input-border);
-      border-radius: var(--radius-md);
-      background: transparent;
-      color: var(--text-color);
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%; resize: none; padding: 16px; border: 1px solid var(--input-border);
+      border-radius: var(--radius-md); background: transparent; color: var(--text-color);
       font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
-      font-size: 0.95rem;
-      line-height: 1.65;
-      overflow: auto;
-      transition: color 0.2s ease, border-color 0.2s ease;
+      font-size: 0.95rem; line-height: 1.65; overflow: auto; transition: color 0.2s ease, border-color 0.2s ease;
     }
+    #noteContent.readonly { opacity: .95; }
 
-    #noteContent.readonly {
-      opacity: .95;
-    }
+    mark { background-color: rgba(32, 128, 140, 0.35); color: inherit; border-radius: 4px; padding: 2px 0; }
+    mark.current-match { background-color: rgba(32, 128, 140, 0.6); box-shadow: 0 0 0 2px rgba(32, 128, 140, 0.4); }
+    body.light-mode mark { background-color: rgba(32, 128, 140, 0.25); }
+    body.light-mode mark.current-match { background-color: rgba(32, 128, 140, 0.5); }
 
-    mark {
-      background-color: rgba(32, 128, 140, 0.35);
-      color: inherit;
-      border-radius: 4px;
-      padding: 2px 0;
-    }
+    .theme-row { margin-top: auto; padding-top: 14px; border-top: 1px solid var(--input-border); display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .theme-row label { font-size: 0.95rem; color: var(--text-color); font-weight: 600; }
 
-    mark.current-match {
-      background-color: rgba(32, 128, 140, 0.6);
-      box-shadow: 0 0 0 2px rgba(32, 128, 140, 0.4);
-    }
+    .switch { position: relative; width: 54px; height: 30px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; inset: 0; cursor: pointer; background: #3f3f3f; transition: .25s; border-radius: 30px; }
+    .slider:before { content: ""; position: absolute; height: 24px; width: 24px; left: 3px; bottom: 3px; background: #fff; transition: .25s; border-radius: 50%; }
+    input:checked+.slider { background: var(--btn-bg); }
+    input:checked+.slider:before { transform: translateX(24px); }
 
-    body.light-mode mark {
-      background-color: rgba(32, 128, 140, 0.25);
+    /* Modal styles */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.45); display: none; z-index: 3000;
+      align-items: center; justify-content: center; padding: 16px;
     }
-
-    body.light-mode mark.current-match {
-      background-color: rgba(32, 128, 140, 0.5);
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--panel-bg); color: var(--text-color); border: 1px solid var(--input-border);
+      border-radius: var(--radius-lg); box-shadow: var(--elev); width: 100%; max-width: 420px; padding: 18px;
     }
-
-    .theme-row {
-      margin-top: auto;
-      padding-top: 14px;
-      border-top: 1px solid var(--input-border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
+    .modal-title { margin: 0 0 8px; font-weight: 700; font-size: 1.05rem; }
+    .modal-message { margin: 0 0 14px; opacity: .9; font-size: 0.95rem; }
+    .modal-input {
+      width: 100%; padding: 12px 14px; border: 1px solid var(--input-border); border-radius: var(--radius-md);
+      background: var(--input-bg); color: var(--text-color); font-size: 0.95rem; margin-bottom: 14px;
     }
-
-    .theme-row label {
-      font-size: 0.95rem;
-      color: var(--text-color);
-      font-weight: 600;
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+    .modal-btn {
+      border: none; padding: 10px 14px; border-radius: var(--radius-md); cursor: pointer; font-weight: 700; font-size: 0.95rem;
     }
-
-    .switch {
-      position: relative;
-      width: 54px;
-      height: 30px;
-    }
-
-    .switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-
-    .slider {
-      position: absolute;
-      inset: 0;
-      cursor: pointer;
-      background: #3f3f3f;
-      transition: .25s;
-      border-radius: 30px;
-    }
-
-    .slider:before {
-      content: "";
-      position: absolute;
-      height: 24px;
-      width: 24px;
-      left: 3px;
-      bottom: 3px;
-      background: #fff;
-      transition: .25s;
-      border-radius: 50%;
-    }
-
-    input:checked+.slider {
-      background: var(--btn-bg);
-    }
-
-    input:checked+.slider:before {
-      transform: translateX(24px);
-    }
+    .modal-btn.primary { background: var(--btn-bg); color: var(--btn-text); }
+    .modal-btn.primary:hover { background: var(--btn-hover); }
+    .modal-btn.ghost { background: transparent; color: var(--text-color); }
+    .modal-btn.ghost:hover { background: var(--hover-bg); }
   </style>
 </head>
 
@@ -665,30 +321,26 @@
       <div class="actions">
         <button id="findToggle" class="icon-btn" title="Find in note" aria-label="Find">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path
-              d="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z" />
+            <path d="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z" />
           </svg>
         </button>
 
         <button id="editToggle" class="icon-btn" title="Toggle edit" aria-label="Edit">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path
-              d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.01 1.01 0 0 0 0-1.42l-2.34-2.34a1.01 1.01 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 1.84-1.82z" />
+            <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.01 1.01 0 0 0 0-1.42l-2.34-2.34a1.01 1.01 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 1.84-1.82z" />
           </svg>
         </button>
 
-        <!-- Desktop: Individual buttons -->
         <div class="desktop-actions">
           <button id="txtBtn" class="icon-btn" title="Export as TXT" aria-label="Export TXT">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-              <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
+              <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
             </svg>
           </button>
 
           <button id="pdfBtn" class="icon-btn" title="Export as PDF" aria-label="Export PDF">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-              <path
-                d="M14,2L20,8V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V4A2,2 0 0,1 6,2H14M18,20V9H13V4H6V20H18M10,19H12V18H10.5V17H12V16H10.5V15H12V14H10V19M14.5,19H16.5L15.5,14H14L14.5,19Z" />
+              <path d="M14,2L20,8V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V4A2,2 0 0,1 6,2H14M18,20V9H13V4H6V20H18M10,19H12V18H10.5V17H12V16H10.5V15H12V14H10V19M14.5,19H16.5L15.5,14H14L14.5,19Z"/>
             </svg>
           </button>
 
@@ -700,15 +352,15 @@
         </div>
 
         <!-- Mobile: Kebab menu trigger -->
-        <button id="exportToggle" class="icon-btn" title="More options" aria-label="More" aria-haspopup="menu"
-          aria-expanded="false">
+        <button id="exportToggle" class="icon-btn" title="More options" aria-label="More"
+          aria-haspopup="menu" aria-expanded="false">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path d="M12 8a2 2 0 110-4 2 2 0 010 4zm0 6a2 2 0 110-4 2 2 0 010 4zm0 6a2 2 0 110-4 2 2 0 010 4z" />
+            <path d="M12 8a2 2 0 110-4 2 2 0 010 4zm0 6a2 2 0 110-4 2 2 0 010 4zm0 6a2 2 0 110-4 2 2 0 010 4z"/>
           </svg>
         </button>
       </div>
 
-      <!-- Mobile export dropdown (anchored to viewport) -->
+      <!-- Mobile: Export dropdown (anchored to viewport) -->
       <div class="export-menu" id="exportMenu" role="menu" aria-label="Export menu">
         <button class="export-menu-item" role="menuitem" id="txtBtnMobile">Export as TXT</button>
         <button class="export-menu-item" role="menuitem" id="pdfBtnMobile">Export as PDF</button>
@@ -721,8 +373,7 @@
           <input type="text" id="findBoxDropdown" placeholder="Find in note..." autocomplete="off" />
           <button id="closeSearch" class="icon-btn" title="Close search" style="padding: 6px;">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-              <path
-                d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+              <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
             </svg>
           </button>
         </div>
@@ -754,6 +405,19 @@
       </div>
     </section>
   </main>
+
+  <!-- Reusable Modal (custom confirm/prompt) -->
+  <div id="modalOverlay" class="modal-overlay" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal" role="document">
+      <h3 class="modal-title" id="modalTitle">Title</h3>
+      <p class="modal-message" id="modalMessage">Message</p>
+      <input id="modalInput" class="modal-input" type="text" placeholder="" style="display:none;" />
+      <div class="modal-actions">
+        <button id="modalCancel" class="modal-btn ghost" type="button">Cancel</button>
+        <button id="modalOk" class="modal-btn primary" type="button">OK</button>
+      </div>
+    </div>
+  </div>
 
   <script>
     const firebaseConfig = {
@@ -796,6 +460,14 @@
     const nextMatch = document.getElementById('nextMatch');
     const matchInfo = document.getElementById('matchInfo');
 
+    // Modal elements
+    const modalOverlay = document.getElementById('modalOverlay');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalMessage = document.getElementById('modalMessage');
+    const modalInput = document.getElementById('modalInput');
+    const modalOk = document.getElementById('modalOk');
+    const modalCancel = document.getElementById('modalCancel');
+
     let allNotes = [];
     let isEditing = true;
     let currentNoteId = '';
@@ -808,107 +480,112 @@
     hamburgerBtn.addEventListener('click', openMenu);
     overlay.addEventListener('click', closeMenu);
 
-    // Robust export menu: viewport clamping + safe measuring
+    // Custom modal API
+    let modalResolve = null;
+    let lastFocused = null;
+
+    function openConfirm({ title = 'Confirm', message = 'Are you sure?', okText = 'Confirm', cancelText = 'Cancel' } = {}) {
+      return new Promise((resolve) => {
+        modalResolve = resolve;
+        lastFocused = document.activeElement;
+        modalTitle.textContent = title;
+        modalMessage.textContent = message;
+        modalInput.style.display = 'none';
+        modalOk.textContent = okText;
+        modalCancel.textContent = cancelText;
+        modalOverlay.classList.add('open');
+        modalOverlay.setAttribute('aria-hidden', 'false');
+        modalOk.focus();
+      });
+    }
+
+    function openPrompt({ title = 'Input', message = 'Enter value', placeholder = '', defaultValue = '', okText = 'Save', cancelText = 'Cancel' } = {}) {
+      return new Promise((resolve) => {
+        modalResolve = resolve;
+        lastFocused = document.activeElement;
+        modalTitle.textContent = title;
+        modalMessage.textContent = message;
+        modalInput.style.display = '';
+        modalInput.placeholder = placeholder || '';
+        modalInput.value = defaultValue || '';
+        modalOk.textContent = okText;
+        modalCancel.textContent = cancelText;
+        modalOverlay.classList.add('open');
+        modalOverlay.setAttribute('aria-hidden', 'false');
+        setTimeout(() => { modalInput.focus(); modalInput.select(); }, 0);
+      });
+    }
+
+    function closeModal(result) {
+      modalOverlay.classList.remove('open');
+      modalOverlay.setAttribute('aria-hidden', 'true');
+      const resolve = modalResolve;
+      modalResolve = null;
+      if (lastFocused && typeof lastFocused.focus === 'function') lastFocused.focus();
+      resolve && resolve(result);
+    }
+
+    modalOk.addEventListener('click', () => {
+      if (modalInput.style.display !== 'none') closeModal(modalInput.value.trim());
+      else closeModal(true);
+    });
+    modalCancel.addEventListener('click', () => closeModal(null));
+    modalOverlay.addEventListener('click', (e) => {
+      if (e.target === modalOverlay) closeModal(null);
+    });
+    document.addEventListener('keydown', (e) => {
+      if (!modalOverlay.classList.contains('open')) return;
+      if (e.key === 'Escape') { e.preventDefault(); closeModal(null); }
+      if (e.key === 'Enter' && document.activeElement !== modalCancel) {
+        e.preventDefault();
+        modalOk.click();
+      }
+    });
+
+    // Export menu handling
     let exportOutsideAbort = null;
 
     function positionExportMenu() {
-      if (exportMenu.parentElement !== document.body) {
-        document.body.appendChild(exportMenu);
-      }
-
-      // Measure without permanently overriding display
+      if (exportMenu.parentElement !== document.body) document.body.appendChild(exportMenu);
       const wasHidden = getComputedStyle(exportMenu).display === 'none';
-      if (wasHidden) {
-        exportMenu.style.visibility = 'hidden';
-        exportMenu.style.display = 'block';
-      }
+      if (wasHidden) { exportMenu.style.visibility = 'hidden'; exportMenu.style.display = 'block'; }
 
       const rect = exportToggle.getBoundingClientRect();
       const menuWidth = exportMenu.offsetWidth;
       const menuHeight = exportMenu.offsetHeight;
-
       let top = rect.bottom + window.scrollY + 6;
       let left = rect.right - menuWidth + window.scrollX;
 
       const margin = 10;
-      left = Math.max(
-        margin + window.scrollX,
-        Math.min(left, window.scrollX + window.innerWidth - menuWidth - margin)
-      );
-
+      left = Math.max(margin + window.scrollX, Math.min(left, window.scrollX + window.innerWidth - menuWidth - margin));
       const maxBottom = window.scrollY + window.innerHeight - margin;
-      if (top + menuHeight > maxBottom) {
-        top = rect.top + window.scrollY - menuHeight - 6;
-      }
+      if (top + menuHeight > maxBottom) top = rect.top + window.scrollY - menuHeight - 6;
 
       exportMenu.style.top = `${top}px`;
       exportMenu.style.left = `${left}px`;
 
-      if (wasHidden) {
-        // Let CSS .open control visibility; do not force 'none'
-        exportMenu.style.display = '';
-        exportMenu.style.visibility = '';
-      }
+      if (wasHidden) { exportMenu.style.display = ''; exportMenu.style.visibility = ''; }
     }
 
     function bindExportOutsideHandlers() {
       exportOutsideAbort = new AbortController();
       const signal = exportOutsideAbort.signal;
-
-      // Close on pointer outside (capture to fire before click)
       window.addEventListener('pointerdown', (e) => {
         if (!exportMenu.classList.contains('open')) return;
         const onToggle = exportToggle.contains(e.target);
         const onMenu = exportMenu.contains(e.target);
         if (!onToggle && !onMenu) closeExportMenu();
       }, { capture: true, signal });
-
-      // Escape key
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && exportMenu.classList.contains('open')) {
-          closeExportMenu();
-          exportToggle.focus();
-        }
-      }, { signal });
-
-      // Reposition on resize
-      window.addEventListener('resize', () => {
-        if (exportMenu.classList.contains('open')) positionExportMenu();
-      }, { signal });
-
-      // Close on scroll anywhere
-      window.addEventListener('scroll', () => {
-        if (exportMenu.classList.contains('open')) closeExportMenu();
-      }, { capture: true, signal });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && exportMenu.classList.contains('open')) { closeExportMenu(); exportToggle.focus(); } }, { signal });
+      window.addEventListener('resize', () => { if (exportMenu.classList.contains('open')) positionExportMenu(); }, { signal });
+      window.addEventListener('scroll', () => { if (exportMenu.classList.contains('open')) closeExportMenu(); }, { capture: true, signal });
     }
+    function unbindExportOutsideHandlers() { exportOutsideAbort?.abort(); exportOutsideAbort = null; }
+    function openExportMenu() { exportMenu.classList.add('open'); exportToggle.setAttribute('aria-expanded', 'true'); positionExportMenu(); bindExportOutsideHandlers(); }
+    function closeExportMenu() { exportMenu.classList.remove('open'); exportToggle.setAttribute('aria-expanded', 'false'); unbindExportOutsideHandlers(); }
 
-    function unbindExportOutsideHandlers() {
-      exportOutsideAbort?.abort();
-      exportOutsideAbort = null;
-    }
-
-    function openExportMenu() {
-      exportMenu.classList.add('open');
-      exportToggle.setAttribute('aria-expanded', 'true');
-      positionExportMenu();
-      bindExportOutsideHandlers();
-    }
-
-    function closeExportMenu() {
-      exportMenu.classList.remove('open');
-      exportToggle.setAttribute('aria-expanded', 'false');
-      unbindExportOutsideHandlers();
-    }
-
-    exportToggle.addEventListener('click', (e) => {
-      e.stopPropagation();
-      if (exportMenu.classList.contains('open')) closeExportMenu();
-      else openExportMenu();
-    });
-
-    // Prevent inside clicks from propagating as "outside"
+    exportToggle.addEventListener('click', (e) => { e.stopPropagation(); if (exportMenu.classList.contains('open')) closeExportMenu(); else openExportMenu(); });
     exportMenu.addEventListener('click', (e) => e.stopPropagation());
-
 
     function setEditing(editing) {
       isEditing = editing;
@@ -926,15 +603,8 @@
       setEditing(true);
     }
 
-    function escapeHtml(text) {
-      const div = document.createElement('div');
-      div.textContent = text;
-      return div.innerHTML;
-    }
-
-    function escapeRegex(str) {
-      return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    }
+    function escapeHtml(text) { const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
+    function escapeRegex(str) { return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
 
     function applyHighlights() {
       const text = noteContent.value;
@@ -944,13 +614,10 @@
       if (currentSearchTerm) {
         const regex = new RegExp(escapeRegex(currentSearchTerm), 'gi');
         let match;
-        while ((match = regex.exec(text)) !== null) {
-          matchPositions.push({ start: match.index, end: match.index + match[0].length });
-        }
+        while ((match = regex.exec(text)) !== null) matchPositions.push({ start: match.index, end: match.index + match[0].length });
 
         if (matchPositions.length > 0) {
-          let lastIndex = 0;
-          let result = '';
+          let lastIndex = 0, result = '';
           matchPositions.forEach((pos, idx) => {
             result += escapeHtml(text.substring(lastIndex, pos.start));
             const classAttr = idx === currentMatchIndex ? ' class="current-match"' : '';
@@ -959,111 +626,55 @@
           });
           result += escapeHtml(text.substring(lastIndex));
           highlightedText = result;
-
           updateMatchInfo();
-        } else {
-          matchInfo.textContent = 'No matches';
-          currentMatchIndex = -1;
-        }
+        } else { matchInfo.textContent = 'No matches'; currentMatchIndex = -1; }
 
         prevMatch.disabled = matchPositions.length === 0;
         nextMatch.disabled = matchPositions.length === 0;
       } else {
-        matchInfo.textContent = 'No matches';
-        currentMatchIndex = -1;
-        prevMatch.disabled = true;
-        nextMatch.disabled = true;
+        matchInfo.textContent = 'No matches'; currentMatchIndex = -1; prevMatch.disabled = true; nextMatch.disabled = true;
       }
 
-      if (text.endsWith('\n')) {
-        highlightedText += '\n';
-      }
-
+      if (text.endsWith('\n')) highlightedText += '\n';
       highlightBackdrop.innerHTML = highlightedText;
     }
 
     function updateMatchInfo() {
-      if (matchPositions.length === 0) {
-        matchInfo.textContent = 'No matches';
-      } else {
-        matchInfo.textContent = `${currentMatchIndex + 1} / ${matchPositions.length}`;
-      }
+      if (matchPositions.length === 0) matchInfo.textContent = 'No matches';
+      else matchInfo.textContent = `${currentMatchIndex + 1} / ${matchPositions.length}`;
     }
 
     function scrollToMatch(index) {
       if (index < 0 || index >= matchPositions.length) return;
-
       const pos = matchPositions[index];
       noteContent.focus();
       noteContent.setSelectionRange(pos.start, pos.end);
-
-      const lineHeight = 1.65;
-      const fontSize = 0.95;
+      const lineHeight = 1.65, fontSize = 0.95;
       const lines = noteContent.value.substring(0, pos.start).split('\n').length;
       const scrollTop = (lines - 5) * (fontSize * 16 * lineHeight);
       noteContent.scrollTop = Math.max(0, scrollTop);
-
       syncScroll();
     }
 
-    function goToPrevMatch() {
-      if (matchPositions.length === 0) return;
-      currentMatchIndex = currentMatchIndex <= 0 ? matchPositions.length - 1 : currentMatchIndex - 1;
-      applyHighlights();
-      scrollToMatch(currentMatchIndex);
-    }
-
-    function goToNextMatch() {
-      if (matchPositions.length === 0) return;
-      currentMatchIndex = currentMatchIndex >= matchPositions.length - 1 ? 0 : currentMatchIndex + 1;
-      applyHighlights();
-      scrollToMatch(currentMatchIndex);
-    }
-
-    function syncScroll() {
-      highlightBackdrop.scrollTop = noteContent.scrollTop;
-      highlightBackdrop.scrollLeft = noteContent.scrollLeft;
-    }
+    function goToPrevMatch() { if (!matchPositions.length) return; currentMatchIndex = currentMatchIndex <= 0 ? matchPositions.length - 1 : currentMatchIndex - 1; applyHighlights(); scrollToMatch(currentMatchIndex); }
+    function goToNextMatch() { if (!matchPositions.length) return; currentMatchIndex = currentMatchIndex >= matchPositions.length - 1 ? 0 : currentMatchIndex + 1; applyHighlights(); scrollToMatch(currentMatchIndex); }
+    function syncScroll() { highlightBackdrop.scrollTop = noteContent.scrollTop; highlightBackdrop.scrollLeft = noteContent.scrollLeft; }
 
     noteContent.addEventListener('input', applyHighlights);
     noteContent.addEventListener('scroll', syncScroll);
 
     findToggle.addEventListener('click', () => {
       const isOpen = searchPanel.classList.contains('open');
-      if (isOpen) {
-        searchPanel.classList.remove('open');
-      } else {
-        searchPanel.classList.add('open');
-        findBoxDropdown.focus();
-        findBoxDropdown.select();
-      }
+      if (isOpen) searchPanel.classList.remove('open');
+      else { searchPanel.classList.add('open'); findBoxDropdown.focus(); findBoxDropdown.select(); }
     });
 
-    closeSearch.addEventListener('click', () => {
-      searchPanel.classList.remove('open');
-      currentSearchTerm = '';
-      currentMatchIndex = -1;
-      matchPositions = [];
-      applyHighlights();
-    });
-
-    findBoxDropdown.addEventListener('input', (e) => {
-      currentSearchTerm = e.target.value.trim();
-      currentMatchIndex = -1;
-      applyHighlights();
-    });
-
+    closeSearch.addEventListener('click', () => { searchPanel.classList.remove('open'); currentSearchTerm = ''; currentMatchIndex = -1; matchPositions = []; applyHighlights(); });
+    findBoxDropdown.addEventListener('input', (e) => { currentSearchTerm = e.target.value.trim(); currentMatchIndex = -1; applyHighlights(); });
     findBoxDropdown.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        if (e.shiftKey) goToPrevMatch();
-        else goToNextMatch();
-      }
-      if (e.key === 'Escape') {
-        closeSearch.click();
-      }
+      if (e.key === 'Enter') { e.preventDefault(); if (e.shiftKey) goToPrevMatch(); else goToNextMatch(); }
+      if (e.key === 'Escape') closeSearch.click();
     });
-
     prevMatch.addEventListener('click', goToPrevMatch);
     nextMatch.addEventListener('click', goToNextMatch);
 
@@ -1071,66 +682,40 @@
       notesUl.innerHTML = '';
       if (!list.length) {
         const li = document.createElement('li');
-        li.className = 'note-item';
-        li.style.opacity = '0.5';
-        li.style.cursor = 'default';
-        li.textContent = 'No notes found.';
+        li.className = 'note-item'; li.style.opacity = '0.5'; li.style.cursor = 'default'; li.textContent = 'No notes found.';
         notesUl.appendChild(li);
         return;
       }
       list.forEach(n => {
-        const li = document.createElement('li');
-        li.className = 'note-item';
-        li.tabIndex = 0;
+        const li = document.createElement('li'); li.className = 'note-item'; li.tabIndex = 0;
 
         const title = document.createElement('span');
-        title.className = 'note-title';
-        title.textContent = n.id;
-        title.title = 'Open note';
+        title.className = 'note-title'; title.textContent = n.id; title.title = 'Open note';
 
         li.addEventListener('click', async (e) => {
           if (e.target.closest('.kebab') || e.target.closest('.menu')) return;
           try {
             const snap = await db.collection('notes').doc(n.id).get();
             const content = snap.exists ? (snap.data().content || '') : (n.content || '');
-            currentNoteId = n.id;
-            noteNameInput.value = n.id;
-            noteContent.value = content;
-            currentSearchTerm = '';
-            currentMatchIndex = -1;
-            matchPositions = [];
-            applyHighlights();
-            setEditing(false);
-            findBoxDropdown.value = '';
-            searchPanel.classList.remove('open');
-            closeMenu();
+            currentNoteId = n.id; noteNameInput.value = n.id; noteContent.value = content;
+            currentSearchTerm = ''; currentMatchIndex = -1; matchPositions = []; applyHighlights(); setEditing(false);
+            findBoxDropdown.value = ''; searchPanel.classList.remove('open'); closeMenu();
           } catch (err) {
             alert('Error loading note: ' + err.message);
           }
         });
 
         const kebab = document.createElement('button');
-        kebab.className = 'icon-btn kebab';
-        kebab.title = 'More actions';
-        kebab.innerHTML = `
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 8a2 2 0 110-4 2 2 0 010 4zm0 6a2 2 0 110-4 2 2 0 010 4zm0 6a2 2 0 110-4 2 2 0 010 4z"/>
-          </svg>
-        `;
+        kebab.className = 'icon-btn kebab'; kebab.title = 'More actions';
+        kebab.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 8a2 2 0 110-4 2 2 0 010 4zm0 6a2 2 0 110-4 2 2 0 010 4zm0 6a2 2 0 110-4 2 2 0 010 4z"/></svg>`;
 
-        const menu = document.createElement('div');
-        menu.className = 'menu';
+        const menu = document.createElement('div'); menu.className = 'menu';
 
-        const renameItem = document.createElement('button');
-        renameItem.className = 'menu-item';
-        renameItem.textContent = 'Rename';
+        const renameItem = document.createElement('button'); renameItem.className = 'menu-item'; renameItem.textContent = 'Rename';
+        const deleteItem = document.createElement('button'); deleteItem.className = 'menu-item'; deleteItem.textContent = 'Delete';
 
-        const deleteItem = document.createElement('button');
-        deleteItem.className = 'menu-item';
-        deleteItem.textContent = 'Delete';
-
-        menu.appendChild(renameItem);
-        menu.appendChild(deleteItem);
+        menu.appendChild(renameItem); menu.appendChild(deleteItem);
 
         function openKebabMenu(e) {
           e.stopPropagation();
@@ -1144,22 +729,22 @@
           menu.classList.remove('open');
           if (menu.parentElement === document.body) document.body.removeChild(menu);
         }
-        kebab.addEventListener('click', (e) => {
-          e.stopPropagation();
-          if (menu.classList.contains('open')) closeKebabMenu();
-          else openKebabMenu(e);
-        });
-        document.addEventListener('click', (e) => {
-          if (!menu.contains(e.target) && e.target !== kebab) closeKebabMenu();
-        });
+        kebab.addEventListener('click', (e) => { e.stopPropagation(); if (menu.classList.contains('open')) closeKebabMenu(); else openKebabMenu(e); });
+        document.addEventListener('click', (e) => { if (!menu.contains(e.target) && e.target !== kebab) closeKebabMenu(); });
 
         renameItem.addEventListener('click', async (e) => {
-          e.stopPropagation();
-          closeKebabMenu();
+          e.stopPropagation(); closeKebabMenu();
           const oldId = n.id;
-          const newId = prompt('Rename note to:', oldId);
-          if (!newId || newId.trim() === oldId) return;
-          const clean = newId.trim();
+          const input = await openPrompt({
+            title: 'Rename Note',
+            message: `Rename "${oldId}" to:`,
+            placeholder: 'New name',
+            defaultValue: oldId,
+            okText: 'Rename',
+            cancelText: 'Cancel'
+          });
+          if (!input || input === oldId) return;
+          const clean = input.trim();
           if (!/^[\w\s\-]+$/.test(clean)) { alert('Use letters, numbers, spaces, _ or -'); return; }
           if (allNotes.some(x => x.id.toLowerCase() === clean.toLowerCase())) { alert('Name exists'); return; }
           try {
@@ -1167,7 +752,7 @@
             const data = snap.exists ? snap.data() : { content: n.content || '' };
             await db.collection('notes').doc(clean).set({ content: data.content || '' });
             await db.collection('notes').doc(oldId).delete();
-            allNotes = allNotes.filter(x => x.id !== oldId).concat([{ id: clean, content: data.content || '' }]).sort((a, b) => a.id.localeCompare(b.id));
+            allNotes = allNotes.filter(x => x.id !== oldId).concat([{ id: clean, content: data. content || '' }]).sort((a, b) => a.id.localeCompare(b.id));
             renderList(filterNotes(searchNotesInput.value));
             if (currentNoteId === oldId) currentNoteId = clean;
             alert(`Renamed to "${clean}"`);
@@ -1179,7 +764,13 @@
         deleteItem.addEventListener('click', async (e) => {
           e.stopPropagation();
           closeKebabMenu();
-          if (!confirm(`Delete "${n.id}"?`)) return;
+          const ok = await openConfirm({
+            title: 'Delete Note',
+            message: `Delete "${n.id}"? This cannot be undone.`,
+            okText: 'Delete',
+            cancelText: 'Cancel'
+          });
+          if (!ok) return;
           try {
             await db.collection('notes').doc(n.id).delete();
             allNotes = allNotes.filter(x => x.id !== n.id);
@@ -1237,7 +828,13 @@
     async function deleteOpenNote() {
       const id = currentNoteId || noteNameInput.value.trim();
       if (!id) { alert('No note open'); return; }
-      if (!confirm(`Delete "${id}"?`)) return;
+      const ok = await openConfirm({
+        title: 'Delete Note',
+        message: `Delete "${id}"? This cannot be undone.`,
+        okText: 'Delete',
+        cancelText: 'Cancel'
+      });
+      if (!ok) return;
       try {
         await db.collection('notes').doc(id).delete();
         allNotes = allNotes.filter(n => n.id !== id);
@@ -1345,5 +942,4 @@
     applyHighlights();
   </script>
 </body>
-
 </html>
