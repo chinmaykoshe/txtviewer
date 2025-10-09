@@ -1185,7 +1185,13 @@
         userSubEl.textContent = `Auto-saved for ${daysLeft} day${daysLeft === 1 ? '' : 's'}`;
         renderUserMenuAnonymous();
       } else {
-        const name = user.displayName || user.email || 'User';
+        let name = 'User';
+        if (user.displayName) {
+          name = user.displayName;
+        } else if (user.email) {
+          // Split at '@' and take the first part
+          name = user.email.split('@')[0];
+        }
         userNameEl.textContent = name;
         userSubEl.textContent = 'Signed in';
         renderUserMenuSignedIn();
@@ -1201,24 +1207,16 @@
       const googleBtn = document.createElement('button');
       googleBtn.className = 'menu-item';
       googleBtn.textContent = 'Continue with Google';
-      const emailBtn = document.createElement('button');
-      emailBtn.className = 'menu-item';
-      emailBtn.textContent = 'Sign up / Sign in (Email)';
       const logoutBtn = document.createElement('button');
       logoutBtn.className = 'menu-item';
       logoutBtn.textContent = 'Logout (clear guest)';
       userMenu.appendChild(info);
       userMenu.appendChild(googleBtn);
-      userMenu.appendChild(emailBtn);
       userMenu.appendChild(logoutBtn);
 
       googleBtn.addEventListener('click', async () => {
         closeUserMenu();
         await upgradeWithGoogle();
-      });
-      emailBtn.addEventListener('click', async () => {
-        closeUserMenu();
-        await upgradeWithEmail();
       });
       logoutBtn.addEventListener('click', async () => {
         closeUserMenu();
@@ -1263,6 +1261,11 @@
     }
 
     async function upgradeWithGoogle() {
+      try {
+        await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+      } catch (e) {
+        console.warn("Could not set persistence in upgradeWithGoogle:", e);
+      }
       const provider = new firebase.auth.GoogleAuthProvider();
       const anonUid = auth.currentUser?.isAnonymous ? auth.currentUser.uid : localStorage.getItem(LS_ANON_UID);
       try {
@@ -1291,63 +1294,6 @@
         }
       }
     }
-
-    async function upgradeWithEmail() {
-      // Ask for email and password using custom prompt
-      const email = await openPrompt({ title: 'Email', message: 'Enter email address', placeholder: 'name@example.com', okText: 'Next', cancelText: 'Cancel' });
-      if (!email) return;
-      const password = await openPrompt({ title: 'Password', message: 'Enter password', placeholder: 'Password', okText: 'Continue', cancelText: 'Cancel' });
-      if (!password) return;
-      const cred = firebase.auth.EmailAuthProvider.credential(email, password);
-      const anonUid = auth.currentUser?.isAnonymous ? auth.currentUser.uid : localStorage.getItem(LS_ANON_UID);
-      try {
-        if (auth.currentUser?.isAnonymous) {
-          await auth.currentUser.linkWithCredential(cred);
-          // Linked in place, UID unchanged
-        } else {
-          await auth.signInWithCredential(cred);
-          const newUid = auth.currentUser.uid;
-          if (anonUid && anonUid !== newUid) {
-            await mergeNotes(anonUid, newUid);
-          }
-        }
-      } catch (e) {
-        if (e.code === 'auth/email-already-in-use' || e.code === 'auth/credential-already-in-use') {
-          const prevAnonUid = anonUid;
-          await auth.signInWithCredential(cred);
-          const newUid = auth.currentUser.uid;
-          if (prevAnonUid && prevAnonUid !== newUid) {
-            await mergeNotes(prevAnonUid, newUid);
-          }
-        } else if (e.code === 'auth/weak-password') {
-          alert('Weak password. Please try again.');
-        } else if (e.code === 'auth/invalid-email') {
-          alert('Invalid email address.');
-        } else {
-          console.error('Email upgrade failed', e);
-        }
-      }
-    }
-
-    // Auth state
-    auth.onAuthStateChanged(async (user) => {
-      if (!user) {
-        await ensureAnon();
-        return;
-      }
-      if (user.isAnonymous) {
-        // Set 7-day window metadata
-        setAnonMetadata(user.uid);
-      } else {
-        // Clear anon markers on sign-in
-        localStorage.removeItem(LS_ANON_UID);
-        localStorage.removeItem(LS_ANON_START);
-        localStorage.removeItem(LS_ANON_EXPIRES);
-      }
-      setNotesRef(user.uid);
-      updateUserUI(user);
-      await loadList();
-    });
 
     // Editor & search
     function setEditing(editing) {
@@ -1515,7 +1461,6 @@
             allNotes = allNotes.filter(x => x.id !== oldId).concat([{ id: clean, content: data.content || '' }]).sort((a, b) => a.id.localeCompare(b.id));
             renderList(filterNotes(searchNotesInput.value));
             if (currentNoteId === oldId) currentNoteId = clean;
-            alert(`Renamed to "${clean}"`);
           } catch (err) { alert('Rename failed: ' + err.message); }
         });
 
@@ -1566,7 +1511,7 @@
         allNotes.sort((a, b) => a.id.localeCompare(b.id));
         renderList(filterNotes(searchNotesInput.value));
         currentNoteId = id;
-        alert('Note saved');
+        setEditing(false);
       } catch (e) {
         alert('Save failed: ' + e.message);
       }
@@ -1724,10 +1669,105 @@
     // Keep icon in sync if user presses Esc
     document.addEventListener('fullscreenchange', updateReadFsIcon);
 
+    // -------------------------------------------------
+    // Robust auth initialization: set persistence FIRST
+    // -------------------------------------------------
+    function localStorageAvailable() {
+      try {
+        const x = '__ls_test__';
+        localStorage.setItem(x, x);
+        localStorage.removeItem(x);
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    async function initAuth() {
+      // check localStorage availability (persistence needs it)
+      if (!localStorageAvailable()) {
+        console.warn("localStorage unavailable — persistent auth may not work (private mode / blocked cookies).");
+      }
+
+      // 1) Ensure persistence is set BEFORE any sign-in
+      try {
+        await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+        console.log("Firebase auth persistence set to LOCAL.");
+      } catch (err) {
+        // If persistence can't be set, log but continue (fallback)
+        console.warn("Failed to set auth persistence to LOCAL:", err);
+      }
+
+      // 2) Attach auth state listener AFTER persistence configured
+      auth.onAuthStateChanged(async (user) => {
+        console.log("onAuthStateChanged — user:", user ? { uid: user.uid, anonymous: user.isAnonymous } : null);
+        if (!user) {
+          // no user yet => create an anonymous user (persistence already set above)
+          try {
+            await ensureAnon();
+            return;
+          } catch (e) {
+            console.error("ensureAnon failed:", e);
+            return;
+          }
+        }
+
+        // If we have a user:
+        if (user.isAnonymous) {
+          // set 7-day window metadata
+          setAnonMetadata(user.uid);
+        } else {
+          // Clear anon markers on sign-in
+          localStorage.removeItem(LS_ANON_UID);
+          localStorage.removeItem(LS_ANON_START);
+          localStorage.removeItem(LS_ANON_EXPIRES);
+        }
+
+        // set notes ref for current user and update UI
+        setNotesRef(user.uid);
+        updateUserUI(user);
+
+        // load notes list only after user has been set
+        try { await loadList(); } catch (err) { console.error("loadList failed:", err); }
+      });
+
+      // 3) Guarantee we have a user at startup: if none, ensureAnon() (persistence already set)
+      // This ensures initial anonymous sign-in uses LOCAL persistence
+      if (!auth.currentUser) {
+        try { await ensureAnon(); } catch (e) { console.error("ensureAnon at init failed:", e); }
+      }
+    }
+
     // Initial boot
     loadTheme();
     setEditing(true);
-    ensureAnon(); // Start with real UI, auto-create anonymous session for 7 days
+
+    async function initAuth() {
+      try {
+        // 1️⃣ Set persistence BEFORE any sign-in happens
+        await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+        console.log("✅ Auth persistence set to LOCAL");
+
+        // 2️⃣ Wait for Firebase Auth to load
+        auth.onAuthStateChanged(async (user) => {
+          if (user) {
+            console.log("User found:", user.uid, user.isAnonymous ? "(anon)" : "(registered)");
+            setNotesRef(user.uid);
+            updateUserUI(user);
+            await loadList();
+          } else {
+            console.log("No user found — signing in anonymously...");
+            await ensureAnon(); // create anon with LOCAL persistence
+          }
+        });
+
+      } catch (err) {
+        console.error("Error initializing Firebase auth persistence:", err);
+        await ensureAnon(); // fallback
+      }
+    }
+
+    initAuth(); // run the improved init
     applyHighlights();
   </script>
 </body>
